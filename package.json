@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration=production && copyfiles -u 1 _redirects dist/app-chats",
+    "build": "ng build --configuration=production && copyfiles -u 1 _redirects dist/app-chats/browser",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -34,13 +34,13 @@
     "@angular/compiler-cli": "^17.1.0",
     "@ionic/angular-toolkit": "latest",
     "@types/jasmine": "~5.1.0",
+    "copyfiles": "^2.4.1",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.3.2",
-    "copyfiles": "^2.4.1"  
+    "typescript": "~5.3.2"
   }
 }
