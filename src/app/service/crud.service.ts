@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class CrudService {
-  public server = 'https://13.51.171.187/ia/API/';
+  public server = 'http://13.51.171.187/ia/API/';
 
   constructor(private http: HttpClient) {}
 
