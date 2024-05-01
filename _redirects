@@ -1,1 +1,2 @@
 /ia/API/* http://13.51.171.187/ia/API/:splat 200!
+/IA/app.php http://13.51.171.187/IA/app.php 200!

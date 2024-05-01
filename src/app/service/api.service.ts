@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://localhost/IA/app.php'; // Asegúrate de que la URL es correcta
+  private apiUrl = 'http://13.51.171.187/IA/app.php'; // Asegúrate de que la URL es correcta
 
   constructor(private http: HttpClient) { }
 
