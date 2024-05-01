@@ -1,0 +1,55 @@
+<div class="chat-layout">
+  <!-- Nombre del perfil en el centro arriba -->
+  <div class="chat-header">{{ nombrePerfil }}</div>
+  <!-- Contenedor principal -->
+  <div class="chat-main">
+    <!-- Contenedor de mensajes a la izquierda -->
+    <div class="messages-container">
+      <!-- Mensajes aquí -->
+      <mat-card
+        *ngFor="let msg of conversacion"
+        [ngClass]="{
+          sent: msg.tipo === 'enviado',
+          received: msg.tipo === 'recibido'
+        }"
+      >
+        <mat-card-content>
+          <div class="message-flex-container">
+            <span class="message-text">{{ msg.fecha }} - {{ msg.texto }}</span>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="borrarMensaje(msg)"
+              aria-label="Icon button with delete icon"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    <!-- Contenedor de respuesta y entrada de texto a la derecha -->
+    <div class="response-input-container">
+      <!-- Respuesta en la parte superior -->
+      <div class="response-container">{{ response }}</div>
+      <!-- Entrada de texto en la parte inferior -->
+      <div class="input-container">
+        <textarea
+          id="messageInput"
+          [(ngModel)]="userInput"
+          placeholder="Escribe tu mensaje aquí..."
+          class="message-input"
+          (keydown)="handleTextareaKeydown($event)"
+          (input)="autoResizeTextarea($event)"
+        >
+        </textarea>
+        <div class="input-buttons">
+          <button mat-button (click)="sendInput()">Enviar</button>
+          <button mat-button (click)="volverAPerfiles()">
+            Volver a perfiles
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

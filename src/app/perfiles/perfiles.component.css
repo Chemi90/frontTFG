@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+
+.contenedor-perfiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-start; /* Alinea los elementos al inicio del contenedor */
+  overflow: auto; /* Permite desplazamiento vertical solo si es necesario */
+  background-color: #111; /* Fondo oscuro */
+  background-image: linear-gradient(145deg, rgba(6, 19, 54, 0.9), rgba(7, 27, 82, 0.9)), url('../../assets/fonfoPerfiles.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  min-height: 100vh;
+}
+
+.perfil-card {
+  margin-top: 50px;
+  width: 300px;
+  margin-bottom: 20px; /* Asegura un margen inferior para separación */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Distribuye el espacio internamente */
+  animation: pulse 1.5s infinite ease-in-out;
+  color: #00d4ff; /* Azul eléctrico para texto */
+  border: 1px solid #00d4ff; /* Borde azul */
+  box-shadow: 0px 0px 10px #00d4ff; /* Sombra azul alrededor */
+}
+
+.mat-card-content {
+  padding: 10px;
+  overflow: hidden; /* Oculta cualquier desbordamiento no deseado */
+}
+
+.logout-container {
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+}
+
+button {
+  font-family: 'Orbitron', sans-serif;
+}
+
+button.mat-raised-button {
+  background-color: #ff0000; /* Rojo para advertencia */
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}

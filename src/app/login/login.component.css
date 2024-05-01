@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+
+.title-container {
+  text-align: center;
+  padding-top: 5vh;
+}
+
+.title {
+  font-size: 4rem;
+  color: #00d4ff; /* Azul eléctrico */
+  font-family: 'Orbitron', sans-serif;
+  animation: fadeInDown 3s infinite alternate ease-in-out;
+}
+
+@keyframes fadeInDown {
+  0%, 100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(-10px);
+  }
+}
+
+.login-container {
+  font-family: 'Orbitron', sans-serif; /* Aplica la fuente a todo el contenedor */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  max-width: 400px;
+  padding: 40px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-card {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif; /* Asegura que la fuente se aplica también aquí */
+}
+
+mat-form-field {
+  font-family: 'Orbitron', sans-serif;
+  width: 100%;
+}
+
+mat-label, mat-card-title { /* Aplica la fuente Orbitron a las etiquetas de Material */
+  font-family: 'Orbitron', sans-serif;
+}
+
+button {
+  font-family: 'Orbitron', sans-serif; /* Fuente para botones */
+  margin-top: 10px;
+}
+
+:host {
+  display: block;
+  background-image: url('../../assets/fondo.png');
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  position: relative;
+}

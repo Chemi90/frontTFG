@@ -1,0 +1,16 @@
+<div class="contenedor-perfiles">
+    <mat-card *ngFor="let perfil of perfiles" class="perfil-card">
+      <mat-card-title>{{ perfil.nombre }}</mat-card-title>
+      <mat-card-content>
+        {{ perfil.descripcion }}
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button (click)="irAlChat(perfil)">Ir al Chat</button>
+      </mat-card-actions>
+    </mat-card>
+
+    <div class="logout-container">
+      <button mat-raised-button color="warn" (click)="finalizarSesion()">Cerrar Sesión</button>
+    </div>
+  </div>
+  

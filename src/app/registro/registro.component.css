@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+
+:host { /* Selector :host para estilizar el componente de Angular */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-image: url('../../assets/fondoRegistro.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.registro-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  background-color: #fff; /* Fondo claro para resaltar el formulario */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: 'Orbitron', sans-serif; /* Asegura que la fuente se aplica a todo el card */
+}
+
+mat-form-field {
+  font-family: 'Orbitron', sans-serif; /* Aplica la fuente a los campos de formulario */
+  width: 100%; /* Asegura que el campo de formulario utilice todo el espacio disponible */
+}
+
+mat-label { /* Aplica la fuente Orbitron a las etiquetas de Material */
+  font-family: 'Orbitron', sans-serif;
+}
+
+button {
+  font-family: 'Orbitron', sans-serif; /* Fuente para botones */
+  margin-top: 10px; /* Espacio después de los campos del formulario */
+}
