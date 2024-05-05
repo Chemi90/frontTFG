@@ -3,14 +3,14 @@
   <div class="chat-header">{{ nombrePerfil }}</div>
   <!-- Contenedor principal -->
   <div class="chat-main">
-    <!-- Contenedor de mensajes a la izquierda -->
+    <!-- Contenedor de mensajes -->
     <div class="messages-container">
       <!-- Mensajes aquí -->
       <mat-card
         *ngFor="let msg of conversacion"
         [ngClass]="{
-          sent: msg.tipo === 'enviado',
-          received: msg.tipo === 'recibido'
+          'sent': msg.tipo === 'enviado',
+          'received': msg.tipo === 'recibido'
         }"
       >
         <mat-card-content>
@@ -28,27 +28,19 @@
         </mat-card-content>
       </mat-card>
     </div>
-    <!-- Contenedor de respuesta y entrada de texto a la derecha -->
-    <div class="response-input-container">
-      <!-- Respuesta en la parte superior -->
-      <div class="response-container">{{ response }}</div>
-      <!-- Entrada de texto en la parte inferior -->
-      <div class="input-container">
-        <textarea
-          id="messageInput"
-          [(ngModel)]="userInput"
-          placeholder="Escribe tu mensaje aquí..."
-          class="message-input"
-          (keydown)="handleTextareaKeydown($event)"
-          (input)="autoResizeTextarea($event)"
-        >
-        </textarea>
-        <div class="input-buttons">
-          <button mat-button (click)="sendInput()">Enviar</button>
-          <button mat-button (click)="volverAPerfiles()">
-            Volver a perfiles
-          </button>
-        </div>
+    <!-- Contenedor de entrada de texto -->
+    <div class="input-container">
+      <textarea
+        id="messageInput"
+        [(ngModel)]="userInput"
+        placeholder="Escribe tu mensaje aquí..."
+        class="message-input"
+        (keydown)="handleTextareaKeydown($event)"
+        (input)="autoResizeTextarea($event)"
+      ></textarea>
+      <div class="input-buttons">
+        <button mat-button (click)="sendInput()">Enviar</button>
+        <button mat-button (click)="volverAPerfiles()">Volver a perfiles</button>
       </div>
     </div>
   </div>

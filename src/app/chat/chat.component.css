@@ -5,123 +5,79 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  font-family: 'Orbitron', sans-serif; /* Aplica la fuente a todo el contenedor */
+  font-family: 'Orbitron', sans-serif;
   padding-left: 20px;
   padding-right: 20px;
-  background-color: #121212; /* Fondo general oscuro */
+  background-color: #121212;
 }
 
 .chat-header {
   text-align: center;
-  padding: 10px 0;
-  margin: 20px 0; /* Ajuste para asegurar espacio en la parte superior */
-  font-size: 4rem; /* Tamaño grande para el nombre del perfil */
-  color: #00d4ff; /* Azul eléctrico */
-  animation: fadeInDown 3s infinite alternate ease-in-out; /* Animación especificada */
-}
-
-@keyframes fadeInDown {
-  0%, 100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  50% {
-    opacity: 0.5;
-    transform: translateY(-10px);
-  }
+  padding: 0px 0;
+  margin: 22px 0;
+  font-size: 4rem;
+  color: #00d4ff;
 }
 
 .chat-main {
   display: flex;
+  flex-direction: column;
   flex-grow: 1;
-  padding: 10px;
-  background-color: #868787; /* Fondo suave para el área principal */
+  background-color: #868787;
 }
 
 .messages-container {
-  width: 30%;
-  overflow-y: auto;
-  margin-right: 10px;
-  max-height: calc(100vh - 80px); /* Ajusta la altura máxima teniendo en cuenta el encabezado */
-  background-color: #868787; /* Fondo claro para los mensajes */
-}
-
-.response-input-container {
-  display: flex;
-  flex-direction: column;
   flex-grow: 1;
-}
-
-.response-container {
   overflow-y: auto;
-  height: 200px;
   margin-bottom: 10px;
-  background-color: #868787; /* Fondo diferente para la respuesta */
+  background-color: #868787;
+  max-height: calc(100vh - 180px); /* Ajusta la altura para mantener el área de entrada visible */
 }
 
 .input-container {
-  flex: 1; /* Ocupa el espacio restante */
   display: flex;
-  flex-direction: column; /* Orienta los elementos internos verticalmente */
-  justify-content: flex-end; /* Alinea los elementos al final del contenedor */
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 95px;
+  background-color: #868787; /* Fondo uniforme para el área de entrada */
 }
 
 .message-input {
   width: 100%;
-  min-height: 50px;
-  max-height: 200px; /* Altura máxima antes de que el scroll interno se active */
-  overflow-y: auto; /* Muestra un scrollbar vertical cuando el contenido excede el máximo de altura */
-  resize: none; /* Evita que el usuario pueda redimensionar el textarea */
-  border: 1px solid #00d4ff; /* Borde que coincide con el color del título */
+  min-height: 66px;
+  max-height: 200px;
+  overflow-y: auto;
+  resize: none;
+  border: none; /* Sin borde para un diseño más limpio */
 }
 
 .input-buttons {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
-  background-color: #e1eff8; /* Fondo para los botones */
-}
-
-button {
-  border: #121212 1px solid;
-}
-
-.message-flex-container {
-  display: flex;
-  justify-content: space-between; /* Alinea el texto a la izquierda y el botón a la derecha */
-  align-items: center; /* Centra los elementos verticalmente */
-  width: 100%; /* Asegura que el contenedor ocupe todo el espacio horizontal disponible */
-}
-
-.message-text {
-  flex-grow: 1; /* Permite que el texto ocupe todo el espacio disponible, empujando el botón hacia la derecha */
-  margin-right: 10px; /* Asegura un poco de espacio entre el texto y el botón */
-}
-
-mat-icon-button {
-  flex-shrink: 0; /* Evita que el botón se reduzca cuando hay mucho texto */
+  padding: 0px 0;
+  background-color: #e1eff8;
 }
 
 .sent mat-card-content {
-  background-color: #82c1ff; /* Azul claro para mensajes enviados */
-  color: #ffffff; /* Texto blanco para contraste */
+  background-color: #82c1ff;
+  color: #ffffff;
   padding: 10px;
   border-radius: 8px;
-  border: 2px solid #0077cc; /* Borde más oscuro que el fondo */
-  margin-bottom: 10px; /* Espacio entre mensajes */
+  border: 2px solid #0077cc;
+  margin-bottom: 10px;
 }
 
 .received mat-card-content {
-  background-color: #ff98a1; /* Rojo claro para mensajes recibidos */
-  color: #ffffff; /* Texto blanco para contraste */
+  background-color: #ff98a1;
+  color: #ffffff;
   padding: 10px;
   border-radius: 8px;
-  border: 2px solid #cc3737; /* Borde más oscuro que el fondo */
-  margin-bottom: 10px; /* Espacio entre mensajes */
+  border: 2px solid #cc3737;
+  margin-bottom: 10px;
 }
 
 .mat-card {
-  box-shadow: none; /* Elimina la sombra por defecto para tener un look más limpio */
+  box-shadow: none;
 }
 
 .message-flex-container {
@@ -131,11 +87,6 @@ mat-icon-button {
   width: 100%; /* Asegura que el contenedor ocupe todo el espacio horizontal disponible */
 }
 
-.message-text {
-  flex-grow: 1; /* Permite que el texto ocupe todo el espacio disponible, empujando el botón hacia la derecha */
-  margin-right: 10px; /* Asegura un poco de espacio entre el texto y el botón */
-}
-
-mat-icon-button {
-  flex-shrink: 0; /* Evita que el botón se reduzca cuando hay mucho texto */
+.mat-icon-button {
+  margin-left: auto; /* Empuja el botón de borrar hacia la derecha del todo */
 }
