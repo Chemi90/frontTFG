@@ -19,7 +19,7 @@
   margin: auto;
   padding: 20px;
   background-color: #fff; /* Fondo claro para resaltar el formulario */
-  border-radius: 8px;
+  border-radius: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   font-family: 'Orbitron', sans-serif; /* Asegura que la fuente se aplica a todo el card */
 }
