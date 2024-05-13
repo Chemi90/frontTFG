@@ -1,27 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
 
 .contenedor-perfiles {
-  display: flex;
+  display:flex;
+  transition:3s;
+  flex-wrap: wrap;
+  gap:20px;
+  justify-content:center;
+  /*display: flex;
   flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
-  align-items: flex-start; /* Alinea los elementos al inicio del contenedor */
-  overflow: auto; /* Permite desplazamiento vertical solo si es necesario */
-  background-color: #111; /* Fondo oscuro */
+  align-items: flex-start; /* Alinea los elementos al inicio del contenedor 
+  overflow: auto; /* Permite desplazamiento vertical solo si es necesario 
+  background-color: #111;  Fondo oscuro */
+
   background-image: linear-gradient(145deg, rgba(6, 19, 54, 0.9), rgba(7, 27, 82, 0.9)), url('../../assets/fonfoPerfiles.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  min-height: 100vh;
+  /*min-height: 100vh;*/
 }
 
 .perfil-card {
-  margin-top: 50px;
-  width: 300px;
-  margin-bottom: 20px; /* Asegura un margen inferior para separación */
+  width:300px;
+  margin-top: 5%;
+  padding: 16px;
+  border-radius: 20px;
+ /* margin-top: 50px;
+  width: 300px; 
+  margin-bottom: 20px; /* Asegura un margen inferior para separación 
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Distribuye el espacio internamente */
+  justify-content: space-between;  Distribuye el espacio internamente */
   animation: pulse 1.5s infinite ease-in-out;
   color: #00d4ff; /* Azul eléctrico para texto */
   border: 1px solid #00d4ff; /* Borde azul */
@@ -36,7 +46,8 @@
 .logout-container {
   width: 100%;
   text-align: center;
-  margin-top: 20px;
+  margin-top: 10%;
+  margin-bottom: 10%;
 }
 
 button {
