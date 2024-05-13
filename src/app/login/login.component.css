@@ -5,6 +5,10 @@
   padding-top: 5vh;
 }
 
+.margen{
+  margin: 14px;
+}
+
 .title {
   font-size: 4rem;
   color: #00d4ff; /* Azul eléctrico */
@@ -21,6 +25,12 @@
     opacity: 0.5;
     transform: translateY(-10px);
   }
+}
+
+.login-name{
+  color: black;
+  margin-top: 14px;
+  margin-left: 40px;
 }
 
 .login-container {
