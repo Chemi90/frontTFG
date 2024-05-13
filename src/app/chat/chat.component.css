@@ -1,73 +1,89 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
-
 .chat-layout {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Asegura que el layout toma toda la altura de la pantalla */
+  height: 100vh;
   overflow: hidden;
   font-family: 'Orbitron', sans-serif;
-  padding: 0 20px; /* Padding horizontal para todo el layout */
-  background-color: #121212; /* Color de fondo general */
+  padding: 0 20px;
+  background-color: #121212;
 }
 
 .chat-header {
   text-align: center;
   padding: 10px 0;
   margin-bottom: 10px;
-  font-size: 2rem; /* Tamaño de fuente más pequeño para dispositivos móviles */
-  color: #00d4ff; /* Color del texto del encabezado */
+  font-size: 2rem;
+  color: #00d4ff;
 }
 
 .chat-main {
-  flex: 1; /* Toma todo el espacio restante */
+  flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: #868787; /* Fondo del área principal del chat */
+  background-color: #868787;
 }
 
 .messages-container {
-  flex: 1; /* Permite que este contenedor crezca y llene el espacio */
-  overflow-y: auto; /* Permite scroll */
+  flex: 1;
+  overflow-y: auto;
   margin-top: 5px;
-  background-color: #868787; /* Color de fondo para los mensajes */
-  max-height: calc(100vh - 180px); /* Altura máxima dinámica */
+  background-color: #868787;
+  max-height: calc(100vh - 180px);
 }
 
 .input-container {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  min-height: 50px; /* Ajuste para asegurar visibilidad en móviles */
-  background-color: #868787; /* Color de fondo para el área de entrada */
-  padding: 10px 0; /* Padding vertical */
+  background-color: #868787;
+  padding: 10px 0;
+  position: sticky;
+  bottom: 0;
 }
 
 .message-input {
   width: 100%;
-  min-height: 50px; /* Altura mínima para asegurar espacio suficiente para escribir */
-  max-height: 200px; /* Limita la altura máxima para evitar exceso de tamaño */
-  overflow-y: auto; /* Permite scroll interno si el texto es muy largo */
-  resize: none; /* Deshabilita la redimensión manual */
-  border: none; /* Elimina bordes */
-  padding: 10px; /* Padding interno */
+  min-height: 50px;
+  max-height: 200px;
+  overflow-y: auto;
+  resize: none;
+  border: none;
+  padding: 10px;
+  margin-bottom: 10px; /* Espacio entre el input y los botones */
+  box-sizing: border-box;
+}
+
+.input-buttons-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%; /* Asegura que el contenedor de los botones ocupe todo el ancho */
+  overflow-x: auto; /* Permite desplazamiento horizontal si es necesario */
 }
 
 .input-buttons {
   display: flex;
   justify-content: space-between;
-  margin-top: 10px; /* Espacio entre el área de texto y los botones */
-  background-color: #e1eff8; /* Color de fondo para los botones */
+  gap: 10px;
+  flex-wrap: nowrap; /* Evita que los botones se muevan a la siguiente línea */
+  background-color: #e1eff8;
+  padding: 10px;
+  width: 100%; /* Asegura que los botones ocupen todo el ancho disponible */
+  box-sizing: border-box;
+}
+
+.input-buttons button {
+  flex: 1 1 auto;
+  white-space: nowrap; /* Evita que el texto se rompa */
 }
 
 .messages-card {
-  background-color: transparent; /* Fondo transparente para las tarjetas de mensajes */
-  box-shadow: none; /* Sin sombras */
-  margin: 5px; /* Margen alrededor de las tarjetas */
+  background-color: transparent;
+  box-shadow: none;
+  margin: 5px;
 }
 
 .sent mat-card-content {
-  background-color: #2b5278; /* Fondo para mensajes enviados */
-  color: #ffffff; /* Texto blanco para mensajes enviados */
+  background-color: #2b5278;
+  color: #ffffff;
   padding: 10px;
   border-radius: 8px;
   border: 2px solid rgb(0, 49, 83);
@@ -76,8 +92,8 @@
 }
 
 .received mat-card-content {
-  background-color: #9d9697; /* Fondo para mensajes recibidos */
-  color: #000000; /* Texto negro para mensajes recibidos */
+  background-color: #9d9697;
+  color: #000000;
   padding: 10px;
   border-radius: 8px;
   border: 2px solid #000000;
@@ -87,11 +103,11 @@
 
 .message-flex-container {
   display: flex;
-  justify-content: space-between; /* Alinea el texto a la izquierda y el botón a la derecha */
-  align-items: center; /* Centra los elementos verticalmente */
-  width: 100%; /* Asegura que el contenedor ocupe todo el espacio horizontal disponible */
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 .mat-icon-button {
-  margin-left: auto; /* Empuja el botón de borrar hacia la derecha del todo */
+  margin-left: auto;
 }
