@@ -48,37 +48,42 @@
   resize: none;
   border: none;
   padding: 10px;
-  margin-bottom: 10px; /* Espacio entre el input y los botones */
+  margin-bottom: 10px;
   box-sizing: border-box;
 }
 
 .input-buttons-wrapper {
   display: flex;
   justify-content: center;
-  width: 100%; /* Asegura que el contenedor de los botones ocupe todo el ancho */
-  overflow-x: auto; /* Permite desplazamiento horizontal si es necesario */
+  width: 100%;
+  overflow-x: auto;
 }
 
 .input-buttons {
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  flex-wrap: nowrap; /* Evita que los botones se muevan a la siguiente línea */
+  flex-wrap: nowrap;
   background-color: #e1eff8;
   padding: 10px;
-  width: 100%; /* Asegura que los botones ocupen todo el ancho disponible */
+  width: 100%;
   box-sizing: border-box;
 }
 
 .input-buttons button {
   flex: 1 1 auto;
-  white-space: nowrap; /* Evita que el texto se rompa */
+  white-space: nowrap;
 }
 
 .messages-card {
   background-color: transparent;
   box-shadow: none;
   margin: 5px;
+}
+
+.sent {
+  display: flex;
+  justify-content: flex-end; /* Alinea los mensajes enviados a la derecha */
 }
 
 .sent mat-card-content {
@@ -89,6 +94,12 @@
   border: 2px solid rgb(0, 49, 83);
   margin-bottom: 10px;
   width: 80%;
+  margin-left: auto; /* Mueve el mensaje a la derecha */
+}
+
+.received {
+  display: flex;
+  justify-content: flex-start; /* Alinea los mensajes recibidos a la izquierda */
 }
 
 .received mat-card-content {
@@ -99,6 +110,7 @@
   border: 2px solid #000000;
   margin-bottom: 10px;
   width: 80%;
+  margin-right: auto; /* Mueve el mensaje a la izquierda */
 }
 
 .message-flex-container {
