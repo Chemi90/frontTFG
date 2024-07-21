@@ -190,40 +190,56 @@ export class ChatComponent implements OnInit {
   }
   
   cargarMensajes(): void {
-    const perfil = this.sessionService.obtenerPerfilSeleccionado();
-    const usuario = this.sessionService.obtenerUsuario();
-  
-    if (!perfil || !usuario) {
-      console.error('Perfil o usuario no seleccionado.');
-      return;
-    }
-  
-    forkJoin({
-      enviados: this.crudService.create('mostrarMensajeEnviado', { perfilIAID: perfil.PerfilIAID, usuarioID: usuario.id_usuario }).pipe(
-        map((response: any) => response.success && response.data ? response.data.map((mensaje: any) => ({
+  const perfil = this.sessionService.obtenerPerfilSeleccionado();
+  const usuario = this.sessionService.obtenerUsuario();
+
+  // Añadir logs para depuración
+  console.log('Perfil seleccionado:', perfil);
+  console.log('Usuario obtenido:', usuario);
+
+  if (!perfil || !usuario) {
+    console.error('Perfil o usuario no seleccionado.');
+    return;
+  }
+
+  forkJoin({
+    enviados: this.crudService.create('mostrarMensajeEnviado', { perfilIAID: perfil.id, usuarioID: usuario.id_usuario }).pipe(
+      map((response: any) => {
+        console.log('Respuesta de mostrarMensajeEnviado:', response);
+        return response.success && response.data ? response.data.map((mensaje: any) => ({
           id: mensaje.MensajeEnviadoID,
           tipo: 'enviado',
           texto: mensaje.CuerpoMensaje,
           fecha: this.formatDate(mensaje.FechaGuardado)
-        })) : [])
-      ),
-      recibidos: this.crudService.create('mostrarMensajeRecibido', { perfilIAID: perfil.PerfilIAID, usuarioID: usuario.id_usuario }).pipe(
-        map((response: any) => response.success && response.data ? response.data.map((mensaje: any) => ({
+        })) : [];
+      })
+    ),
+    recibidos: this.crudService.create('mostrarMensajeRecibido', { perfilIAID: perfil.id, usuarioID: usuario.id_usuario }).pipe(
+      map((response: any) => {
+        console.log('Respuesta de mostrarMensajeRecibido:', response);
+        return response.success && response.data ? response.data.map((mensaje: any) => ({
           id: mensaje.MensajeRecibidoID,
           tipo: 'recibido',
           texto: mensaje.CuerpoMensaje,
           fecha: this.formatReceivedDate(mensaje.FechaGuardado)
-        })) : [])
-      )
-    }).subscribe(({ enviados, recibidos }) => {
-      // Añade los mensajes recibidos y enviados al array temporal
+        })) : [];
+      })
+    )
+  }).subscribe({
+    next: ({ enviados, recibidos }) => {
+      // Añadir los mensajes recibidos y enviados al array temporal
       const mensajesTemporales = [...enviados, ...recibidos];
-      // Ordena los mensajes por fecha
+      // Ordenar los mensajes por fecha
       mensajesTemporales.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
-      // Asigna el array ordenado a la conversación que se muestra en el HTML
+      // Asignar el array ordenado a la conversación que se muestra en el HTML
       this.conversacion = mensajesTemporales;
-    });
-  }
+      console.log('Mensajes combinados:', this.conversacion);
+    },
+    error: (error) => {
+      console.error('Error al cargar mensajes:', error);
+    }
+  });
+}
   
   borrarMensaje(mensaje: any): void {
     console.log('Intentando borrar mensaje:', mensaje);
