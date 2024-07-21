@@ -126,7 +126,8 @@ export class ChatComponent implements OnInit {
     const usuarioID = this.sessionService.obtenerUsuario().id_usuario;
     const perfilIAID = this.sessionService.obtenerPerfilSeleccionado().PerfilIAID;
     const datos = { cuerpoMensaje: mensaje, usuarioID, perfilIAID };
-  
+    
+  console.log('Datos a enviar:', datos); // Añade este log para depuración
     this.crudService.create('guardarMensajeEnviado', datos).subscribe({
       next: (response) => {
         const fechaGuardado = new Date();
@@ -148,6 +149,8 @@ export class ChatComponent implements OnInit {
   guardarMensajeRecibido(mensaje: string): void {
     const usuarioID = this.sessionService.obtenerUsuario().id_usuario;
     const perfilIAID = this.sessionService.obtenerPerfilSeleccionado().PerfilIAID;
+
+    console.log('Datos a recibir:', datos); // Añade este log para depuración
     this.crudService.create('guardarMensajeRecibido', { cuerpoMensaje: mensaje, usuarioID, perfilIAID }).subscribe({
       next: (response) => {
         const fechaGuardado = new Date();
