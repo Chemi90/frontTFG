@@ -207,10 +207,10 @@ export class ChatComponent implements OnInit {
       map((response: any) => {
         console.log('Respuesta de mostrarMensajeEnviado:', response);
         return response.success && response.data ? response.data.map((mensaje: any) => ({
-          id: mensaje.MensajeEnviadoID,
+          id: mensaje[0],
           tipo: 'enviado',
-          texto: mensaje.CuerpoMensaje,
-          fecha: this.formatDate(mensaje.FechaGuardado)
+          texto: mensaje[1],
+          fecha: this.formatDate(new Date(mensaje[2]))
         })) : [];
       })
     ),
@@ -218,10 +218,10 @@ export class ChatComponent implements OnInit {
       map((response: any) => {
         console.log('Respuesta de mostrarMensajeRecibido:', response);
         return response.success && response.data ? response.data.map((mensaje: any) => ({
-          id: mensaje.MensajeRecibidoID,
+          id: mensaje[0],
           tipo: 'recibido',
-          texto: mensaje.CuerpoMensaje,
-          fecha: this.formatReceivedDate(mensaje.FechaGuardado)
+          texto: mensaje[1],
+          fecha: this.formatReceivedDate(new Date(mensaje[2]))
         })) : [];
       })
     )
@@ -240,7 +240,7 @@ export class ChatComponent implements OnInit {
     }
   });
 }
-  
+
   borrarMensaje(mensaje: any): void {
     console.log('Intentando borrar mensaje:', mensaje);
   
