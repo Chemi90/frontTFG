@@ -64,11 +64,17 @@ export class ChatComponent implements OnInit {
   }
   
   formatDate(date: string | Date): string {
-    return this.datePipe.transform(date, 'yyyy-MM-dd HH:mm:ss') || '';
+    if (!date) return '';
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) return '';
+    return this.datePipe.transform(parsedDate, 'yyyy-MM-dd HH:mm:ss') || '';
   }
 
   formatReceivedDate(date: string | Date): string {
-    const adjustedDate = new Date(new Date(date).getTime() + 6 * 60 * 60 * 1000); // Suma 6 horas
+    if (!date) return '';
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) return '';
+    const adjustedDate = new Date(parsedDate.getTime() + 6 * 60 * 60 * 1000); // Suma 6 horas
     return this.datePipe.transform(adjustedDate, 'yyyy-MM-dd HH:mm:ss') || '';
   }
 
@@ -123,124 +129,106 @@ export class ChatComponent implements OnInit {
   }
   
   guardarMensajeEnviado(mensaje: string): void {
-  const usuario = this.sessionService.obtenerUsuario();
-  if (!usuario || !usuario.id_usuario) {
-    console.error('Usuario no definido o ID de usuario faltante.');
-    return;
+    const usuarioID = this.sessionService.obtenerUsuario().id_usuario;
+    const perfilIAID = this.sessionService.obtenerPerfilSeleccionado().id;
+    const datos = { cuerpoMensaje: mensaje, usuarioID, perfilIAID };
+  
+    this.crudService.create('guardarMensajeEnviado', datos).subscribe({
+      next: (response) => {
+        const fechaGuardado = new Date();
+        // Agrega el mensaje al inicio del array
+        this.conversacion.unshift({
+          tipo: 'enviado',
+          texto: mensaje,
+          fecha: this.formatDate(fechaGuardado)
+        });
+        // Opcional: Ordena si es necesario por alguna razón
+        this.conversacion.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+      },
+      error: (error) => {
+        console.error('Error al guardar el mensaje enviado', error);
+      }
+    });
   }
-
-  const perfil = this.sessionService.obtenerPerfilSeleccionado();
-  if (!perfil || !perfil.id) {
-    console.error('Perfil no definido o ID de perfil faltante.');
-    return;
-  }
-
-  const datos = { cuerpoMensaje: mensaje, usuarioID: usuario.id_usuario, perfilIAID: perfil.id };
-
-  console.log('Datos a enviar (guardarMensajeEnviado):', datos); // Log para depuración
-  this.crudService.create('guardarMensajeEnviado', datos).subscribe({
-    next: (response) => {
-      const fechaGuardado = new Date();
-      this.conversacion.unshift({
-        tipo: 'enviado',
-        texto: mensaje,
-        fecha: this.formatDate(fechaGuardado)
-      });
-    },
-    error: (error) => {
-      console.error('Error al guardar el mensaje enviado', error);
-    }
-  });
-}
   
   guardarMensajeRecibido(mensaje: string): void {
-  const usuario = this.sessionService.obtenerUsuario();
-  if (!usuario || !usuario.id_usuario) {
-    console.error('Usuario no definido o ID de usuario faltante.');
-    return;
-  }
+    const usuarioID = this.sessionService.obtenerUsuario().id_usuario;
+    const perfilIAID = this.sessionService.obtenerPerfilSeleccionado().id;
+    this.crudService.create('guardarMensajeRecibido', { cuerpoMensaje: mensaje, usuarioID, perfilIAID }).subscribe({
+      next: (response) => {
+        const fechaGuardado = new Date();
+        // Agrega el mensaje al inicio del array
+        this.conversacion.unshift({
+          tipo: 'recibido',
+          texto: mensaje,
+          fecha: this.formatDate(fechaGuardado)
+        });
+        // Opcional: Ordena si es necesario por alguna razón
+        this.conversacion.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+      },
+      error: (error) => {
+        console.error('Error al guardar el mensaje recibido', error);
+      }
+    });
+  }  
 
-  const perfil = this.sessionService.obtenerPerfilSeleccionado();
-  if (!perfil || !perfil.id) {
-    console.error('Perfil no definido o ID de perfil faltante.');
-    return;
-  }
-
-  const datos = { cuerpoMensaje: mensaje, usuarioID: usuario.id_usuario, perfilIAID: perfil.id };
-
-  console.log('Datos a enviar (guardarMensajeRecibido):', datos); // Log para depuración
-  this.crudService.create('guardarMensajeRecibido', datos).subscribe({
-    next: (response) => {
-      const fechaGuardado = new Date();
-      this.conversacion.unshift({
-        tipo: 'recibido',
-        texto: mensaje,
-        fecha: this.formatDate(fechaGuardado)
-      });
-    },
-    error: (error) => {
-      console.error('Error al guardar el mensaje recibido', error);
-    }
-  });
-}
-  
   agregarYMzclarMensajes(nuevosMensajes: any[]): void {
     this.conversacion = [...this.conversacion, ...nuevosMensajes]; // Añade nuevos mensajes a la conversación existente
     this.conversacion.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()); // Ordena por fecha descendente
   }
   
   cargarMensajes(): void {
-  const perfil = this.sessionService.obtenerPerfilSeleccionado();
-  const usuario = this.sessionService.obtenerUsuario();
-
-  // Añadir logs para depuración
-  console.log('Perfil seleccionado:', perfil);
-  console.log('Usuario obtenido:', usuario);
-
-  if (!perfil || !usuario) {
-    console.error('Perfil o usuario no seleccionado.');
-    return;
-  }
-
-  forkJoin({
-    enviados: this.crudService.create('mostrarMensajeEnviado', { perfilIAID: perfil.id, usuarioID: usuario.id_usuario }).pipe(
-      map((response: any) => {
-        console.log('Respuesta de mostrarMensajeEnviado:', response);
-        return response.success && response.data ? response.data.map((mensaje: any) => ({
-          id: mensaje[0],
-          tipo: 'enviado',
-          texto: mensaje[1],
-          fecha: this.formatDate(new Date(mensaje[2]))
-        })) : [];
-      })
-    ),
-    recibidos: this.crudService.create('mostrarMensajeRecibido', { perfilIAID: perfil.id, usuarioID: usuario.id_usuario }).pipe(
-      map((response: any) => {
-        console.log('Respuesta de mostrarMensajeRecibido:', response);
-        return response.success && response.data ? response.data.map((mensaje: any) => ({
-          id: mensaje[0],
-          tipo: 'recibido',
-          texto: mensaje[1],
-          fecha: this.formatReceivedDate(new Date(mensaje[2]))
-        })) : [];
-      })
-    )
-  }).subscribe({
-    next: ({ enviados, recibidos }) => {
-      // Añadir los mensajes recibidos y enviados al array temporal
-      const mensajesTemporales = [...enviados, ...recibidos];
-      // Ordenar los mensajes por fecha
-      mensajesTemporales.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
-      // Asignar el array ordenado a la conversación que se muestra en el HTML
-      this.conversacion = mensajesTemporales;
-      console.log('Mensajes combinados:', this.conversacion);
-    },
-    error: (error) => {
-      console.error('Error al cargar mensajes:', error);
+    const perfil = this.sessionService.obtenerPerfilSeleccionado();
+    const usuario = this.sessionService.obtenerUsuario();
+  
+    // Añadir logs para depuración
+    console.log('Perfil seleccionado:', perfil);
+    console.log('Usuario obtenido:', usuario);
+  
+    if (!perfil || !usuario) {
+      console.error('Perfil o usuario no seleccionado.');
+      return;
     }
-  });
-}
-
+  
+    forkJoin({
+      enviados: this.crudService.create('mostrarMensajeEnviado', { perfilIAID: perfil.id, usuarioID: usuario.id_usuario }).pipe(
+        map((response: any) => {
+          console.log('Respuesta de mostrarMensajeEnviado:', response);
+          return response.success && response.data ? response.data.map((mensaje: any) => ({
+            id: mensaje.MensajeEnviadoID,
+            tipo: 'enviado',
+            texto: mensaje.CuerpoMensaje,
+            fecha: this.formatDate(mensaje.FechaGuardado)
+          })) : [];
+        })
+      ),
+      recibidos: this.crudService.create('mostrarMensajeRecibido', { perfilIAID: perfil.id, usuarioID: usuario.id_usuario }).pipe(
+        map((response: any) => {
+          console.log('Respuesta de mostrarMensajeRecibido:', response);
+          return response.success && response.data ? response.data.map((mensaje: any) => ({
+            id: mensaje.MensajeRecibidoID,
+            tipo: 'recibido',
+            texto: mensaje.CuerpoMensaje,
+            fecha: this.formatReceivedDate(mensaje.FechaGuardado)
+          })) : [];
+        })
+      )
+    }).subscribe({
+      next: ({ enviados, recibidos }) => {
+        // Añade los mensajes recibidos y enviados al array temporal
+        const mensajesTemporales = [...enviados, ...recibidos];
+        // Ordena los mensajes por fecha
+        mensajesTemporales.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+        // Asigna el array ordenado a la conversación que se muestra en el HTML
+        this.conversacion = mensajesTemporales;
+        console.log('Mensajes combinados:', this.conversacion);
+      },
+      error: (error) => {
+        console.error('Error al cargar mensajes:', error);
+      }
+    });
+  }
+  
   borrarMensaje(mensaje: any): void {
     console.log('Intentando borrar mensaje:', mensaje);
   
