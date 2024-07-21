@@ -150,7 +150,6 @@ export class ChatComponent implements OnInit {
     const usuarioID = this.sessionService.obtenerUsuario().id_usuario;
     const perfilIAID = this.sessionService.obtenerPerfilSeleccionado().PerfilIAID;
 
-    console.log('Datos a recibir:', datos); // Añade este log para depuración
     this.crudService.create('guardarMensajeRecibido', { cuerpoMensaje: mensaje, usuarioID, perfilIAID }).subscribe({
       next: (response) => {
         const fechaGuardado = new Date();
