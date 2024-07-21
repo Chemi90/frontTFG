@@ -123,28 +123,35 @@ export class ChatComponent implements OnInit {
   }
   
   guardarMensajeEnviado(mensaje: string): void {
-    const usuarioID = this.sessionService.obtenerUsuario().id_usuario;
-    const perfilIAID = this.sessionService.obtenerPerfilSeleccionado().PerfilIAID;
-    const datos = { cuerpoMensaje: mensaje, usuarioID, perfilIAID };
-    
-  console.log('Datos a enviar:', datos); // Añade este log para depuración
-    this.crudService.create('guardarMensajeEnviado', datos).subscribe({
-      next: (response) => {
-        const fechaGuardado = new Date();
-        // Agrega el mensaje al inicio del array
-        this.conversacion.unshift({
-          tipo: 'enviado',
-          texto: mensaje,
-          fecha: this.formatDate(fechaGuardado)
-        });
-        // Opcional: Ordena si es necesario por alguna razón
-        this.conversacion.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
-      },
-      error: (error) => {
-        console.error('Error al guardar el mensaje enviado', error);
-      }
-    });
+  const usuario = this.sessionService.obtenerUsuario();
+  if (!usuario || !usuario.id_usuario) {
+    console.error('Usuario no definido o ID de usuario faltante.');
+    return;
   }
+
+  const perfil = this.sessionService.obtenerPerfilSeleccionado();
+  if (!perfil || !perfil.id) {
+    console.error('Perfil no definido o ID de perfil faltante.');
+    return;
+  }
+
+  const datos = { cuerpoMensaje: mensaje, usuarioID: usuario.id_usuario, perfilIAID: perfil.id };
+
+  console.log('Datos a enviar (guardarMensajeEnviado):', datos); // Log para depuración
+  this.crudService.create('guardarMensajeEnviado', datos).subscribe({
+    next: (response) => {
+      const fechaGuardado = new Date();
+      this.conversacion.unshift({
+        tipo: 'enviado',
+        texto: mensaje,
+        fecha: this.formatDate(fechaGuardado)
+      });
+    },
+    error: (error) => {
+      console.error('Error al guardar el mensaje enviado', error);
+    }
+  });
+}
   
   guardarMensajeRecibido(mensaje: string): void {
     const usuarioID = this.sessionService.obtenerUsuario().id_usuario;
