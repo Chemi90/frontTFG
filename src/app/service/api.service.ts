@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'https://josemiguelruizguevara.com:5000/app'; // Nueva URL para Flask
+  private apiUrl = 'https://josemiguelruizguevara.com:5000/app/process_request'; // Nueva URL para Flask
 
   constructor(private http: HttpClient) { }
 
