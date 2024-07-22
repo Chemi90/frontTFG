@@ -115,11 +115,13 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     this.crudService.create('guardarMensajeEnviado', datos).subscribe({
       next: (response) => {
         const fechaGuardado = new Date();
-        this.conversacion.push({
+        const nuevoMensaje = {
           tipo: 'enviado',
           texto: mensaje,
           fecha: this.formatDate(fechaGuardado)
-        });
+        };
+        this.conversacion.push(nuevoMensaje);
+        this.actualizarMemoria();
         this.scrollToBottom();
       },
       error: (error) => {
@@ -134,11 +136,13 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     this.crudService.create('guardarMensajeRecibido', { cuerpoMensaje: mensaje, usuarioID, perfilIAID }).subscribe({
       next: (response) => {
         const fechaGuardado = new Date();
-        this.conversacion.push({
+        const nuevoMensaje = {
           tipo: 'recibido',
           texto: mensaje,
           fecha: this.formatDate(fechaGuardado)
-        });
+        };
+        this.conversacion.push(nuevoMensaje);
+        this.actualizarMemoria();
         this.scrollToBottom();
       },
       error: (error) => {
@@ -148,8 +152,10 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }  
 
   agregarYMzclarMensajes(nuevosMensajes: any[]): void {
+    console.log('Agregando y mezclando mensajes:', nuevosMensajes); // Log al agregar y mezclar mensajes
     this.conversacion = [...this.conversacion, ...nuevosMensajes];
     this.ordenarMensajes();
+    this.actualizarMemoria();
   }
   
   cargarMensajes(): void {
@@ -160,29 +166,44 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       console.error('Perfil o usuario no seleccionado.');
       return;
     }
-  
-    forkJoin({
-      enviados: this.crudService.create('mostrarMensajeEnviado', { perfilIAID: perfil.id, usuarioID: usuario.id_usuario }).pipe(
-        map((response: any) => response.success && response.data ? response.data.map((mensaje: any) => ({
-          id: mensaje.MensajeEnviadoID,
-          tipo: 'enviado',
-          texto: mensaje.CuerpoMensaje,
-          fecha: this.formatDate(mensaje.FechaGuardado)
-        })) : [])
-      ),
-      recibidos: this.crudService.create('mostrarMensajeRecibido', { perfilIAID: perfil.id, usuarioID: usuario.id_usuario }).pipe(
-        map((response: any) => response.success && response.data ? response.data.map((mensaje: any) => ({
-          id: mensaje.MensajeRecibidoID,
-          tipo: 'recibido',
-          texto: mensaje.CuerpoMensaje,
-          fecha: this.formatDate(mensaje.FechaGuardado)
-        })) : [])
-      )
-    }).subscribe(({ enviados, recibidos }) => {
-      const mensajesTemporales = [...enviados, ...recibidos];
-      this.agregarYMzclarMensajes(mensajesTemporales);
+
+    const memoria = this.sessionService.obtenerMemoria(perfil.id, usuario.id_usuario);
+    console.log('Memoria cargada:', memoria); // Log de la memoria cargada
+    if (memoria.length > 0) {
+      this.conversacion = memoria;
       this.scrollToBottom();
-    });
+    } else {
+      forkJoin({
+        enviados: this.crudService.create('mostrarMensajeEnviado', { perfilIAID: perfil.id, usuarioID: usuario.id_usuario }).pipe(
+          map((response: any) => response.success && response.data ? response.data.map((mensaje: any) => ({
+            id: mensaje.MensajeEnviadoID,
+            tipo: 'enviado',
+            texto: mensaje.CuerpoMensaje,
+            fecha: this.formatDateFromServer(mensaje.FechaGuardado, -8) // Restar 8 horas
+          })) : [])
+        ),
+        recibidos: this.crudService.create('mostrarMensajeRecibido', { perfilIAID: perfil.id, usuarioID: usuario.id_usuario }).pipe(
+          map((response: any) => response.success && response.data ? response.data.map((mensaje: any) => ({
+            id: mensaje.MensajeRecibidoID,
+            tipo: 'recibido',
+            texto: mensaje.CuerpoMensaje,
+            fecha: this.formatDateFromServer(mensaje.FechaGuardado, -2) // Restar 2 horas
+          })) : [])
+        )
+      }).subscribe(({ enviados, recibidos }) => {
+        const mensajesTemporales = [...enviados, ...recibidos];
+        this.agregarYMzclarMensajes(mensajesTemporales);
+        this.scrollToBottom();
+      });
+    }
+  }
+
+  actualizarMemoria(): void {
+    const perfil = this.sessionService.obtenerPerfilSeleccionado();
+    const usuario = this.sessionService.obtenerUsuario();
+    if (perfil && usuario) {
+      this.sessionService.guardarMemoria(perfil.id, usuario.id_usuario, this.conversacion);
+    }
   }
 
   ordenarMensajes(): void {
@@ -200,8 +221,10 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     return this.datePipe.transform(date, 'yyyy-MM-dd HH:mm:ss') || '';
   }
 
-  formatReceivedDate(date: string | Date): string {
-    return this.datePipe.transform(date, 'yyyy-MM-dd HH:mm:ss') || '';
+  formatDateFromServer(date: string, offsetHours: number): string {
+    const adjustedDate = new Date(date);
+    adjustedDate.setHours(adjustedDate.getHours() + offsetHours);
+    return this.datePipe.transform(adjustedDate, 'yyyy-MM-dd HH:mm:ss') || '';
   }
 
   scrollToBottom(): void {
@@ -243,6 +266,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         if (response.success) {
           this.conversacion = this.conversacion.filter(msg => msg.id !== mensajeID);
           this.ordenarMensajes();
+          this.actualizarMemoria();
           this.scrollToBottom();
         } else {
           console.error('Error al borrar mensaje enviado:', response.error);
@@ -262,6 +286,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         if (response.success) {
           this.conversacion = this.conversacion.filter(msg => msg.id !== mensajeID);
           this.ordenarMensajes();
+          this.actualizarMemoria();
           this.scrollToBottom();
         } else {
           console.error('Error al borrar mensaje recibido:', response.error);
@@ -274,6 +299,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }
   
   volverAPerfiles(): void {
+    const perfil = this.sessionService.obtenerPerfilSeleccionado();
+    const usuario = this.sessionService.obtenerUsuario();
+    if (perfil && usuario) {
+      this.sessionService.borrarMemoria(perfil.id, usuario.id_usuario);
+    }
     this.router.navigate(['/perfiles']);
   }
 }
