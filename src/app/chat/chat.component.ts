@@ -77,49 +77,52 @@ export class ChatComponent implements OnInit {
     }
   }  
 
-  ngOnInit(): void {
-    const perfil = this.sessionService.obtenerPerfilSeleccionado();
-    const usuario = this.sessionService.obtenerUsuario();
-  
-    // Comprobar si tanto el perfil como el usuario están definidos y el usuario tiene un id.
-    if (perfil && usuario && usuario.id_usuario) {
-      this.nombrePerfil = perfil.nombre; // Asignar el nombre del perfil a una variable para usar en la vista, por ejemplo.
-      this.systemInput = perfil.promptSystem; // Asegúrate de que esto es correcto y coincide con el nombre de la propiedad en el perfil.
-  
-      // Llamar a cargarMensajes que internamente maneja todo lo necesario sin requerir parámetros.
-      this.cargarMensajes();
-    } else {
-      console.error('Perfil o usuario no definido o id_usuario no disponible');
-      this.router.navigate(['/perfiles']); // Redirecciona al usuario a seleccionar un perfil si no hay uno adecuado.
-    }
+ngOnInit(): void {
+  const perfil = this.sessionService.obtenerPerfilSeleccionado();
+  const usuario = this.sessionService.obtenerUsuario();
+
+  // Comprobar si tanto el perfil como el usuario están definidos y el usuario tiene un id.
+  if (perfil && usuario && usuario.id_usuario) {
+    this.nombrePerfil = perfil.nombre; // Asignar el nombre del perfil a una variable para usar en la vista, por ejemplo.
+    this.systemInput = perfil.promptSystem; // Asegúrate de que esto es correcto y coincide con el nombre de la propiedad en el perfil.
+    console.log('Perfil seleccionado:', perfil);
+    console.log('System input asignado:', this.systemInput);
+
+    // Llamar a cargarMensajes que internamente maneja todo lo necesario sin requerir parámetros.
+    this.cargarMensajes();
+  } else {
+    console.error('Perfil o usuario no definido o id_usuario no disponible');
+    this.router.navigate(['/perfiles']); // Redirecciona al usuario a seleccionar un perfil si no hay uno adecuado.
   }
-  
-  sendInput(): void {
-    if (!this.userInput.trim()) {
-      console.log('El input del usuario está vacío.');
-      return; // Evita enviar mensajes vacíos
-    }
-  
-    this.isLoading = true; // Activar el overlay antes de la llamada API
-    this.apiService.predict(this.systemInput, this.userInput).subscribe({
-      next: (data) => {
-        if (data && data.response) {
-          this.response = data.response;
-          this.guardarMensajeEnviado(this.userInput);
-          this.guardarMensajeRecibido(this.response);
-          this.userInput = ''; // Limpia el userInput para el próximo mensaje
-        } else {
-          console.error('Formato de respuesta inesperado:', data);
-        }
-        this.isLoading = false; // Desactivar el overlay cuando se recibe la respuesta
-      },
-      error: (error) => {
-        console.error('Error al recibir respuesta:', error);
-        this.isLoading = false; // Desactivar el overlay en caso de error
+}
+
+sendInput(): void {
+  if (!this.userInput.trim()) {
+    console.log('El input del usuario está vacío.');
+    return; // Evita enviar mensajes vacíos
+  }
+
+  this.isLoading = true; // Activar el overlay antes de la llamada API
+  console.log('Enviando datos:', { systemContent: this.systemInput, userContent: this.userInput });
+  this.apiService.predict(this.systemInput, this.userInput).subscribe({
+    next: (data) => {
+      if (data && data.response) {
+        this.response = data.response;
+        this.guardarMensajeEnviado(this.userInput);
+        this.guardarMensajeRecibido(this.response);
+        this.userInput = ''; // Limpia el userInput para el próximo mensaje
+      } else {
+        console.error('Formato de respuesta inesperado:', data);
       }
-    });
-  }
-  
+      this.isLoading = false; // Desactivar el overlay cuando se recibe la respuesta
+    },
+    error: (error) => {
+      console.error('Error al recibir respuesta:', error);
+      this.isLoading = false; // Desactivar el overlay en caso de error
+    }
+  });
+}
+
   guardarMensajeEnviado(mensaje: string): void {
     const usuarioID = this.sessionService.obtenerUsuario().id_usuario;
     const perfilIAID = this.sessionService.obtenerPerfilSeleccionado().id;
