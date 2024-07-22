@@ -80,7 +80,7 @@ export class ChatComponent implements OnInit {
 ngOnInit(): void {
   const perfil = this.sessionService.obtenerPerfilSeleccionado();
   const usuario = this.sessionService.obtenerUsuario();
-
+console.log('System input asignado:', perfil.promptSystem);
   // Comprobar si tanto el perfil como el usuario están definidos y el usuario tiene un id.
   if (perfil && usuario && usuario.id_usuario) {
     this.nombrePerfil = perfil.nombre; // Asignar el nombre del perfil a una variable para usar en la vista, por ejemplo.
