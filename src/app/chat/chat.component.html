@@ -1,17 +1,13 @@
 <div class="chat-layout">
-  <!-- Nombre del perfil en el centro arriba -->
   <div class="chat-header">{{ nombrePerfil }}</div>
-  <!-- Contenedor principal -->
   <div class="chat-main">
-    <!-- Contenedor de mensajes -->
-    <div class="messages-container">
-      <!-- Mensajes aquí -->
+    <div class="messages-container" #messagesContainer>
       <mat-card
         *ngFor="let msg of conversacion"
         [ngClass]="{
           'sent': msg.tipo === 'enviado',
           'received': msg.tipo === 'recibido'
-        }"  class="messages-card"
+        }" class="messages-card"
       >
         <mat-card-content>
           <div class="message-flex-container">
@@ -28,7 +24,6 @@
         </mat-card-content>
       </mat-card>
     </div>
-    <!-- Contenedor de entrada de texto -->
     <div class="input-container">
       <textarea
         id="messageInput"

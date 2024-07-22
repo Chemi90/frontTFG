@@ -26,7 +26,7 @@
 .messages-container {
   flex: 1;
   overflow-y: auto;
-  margin-top: 5px;
+  margin-top: -10px;
   background-color: #868787;
   max-height: calc(100vh - 180px);
 }

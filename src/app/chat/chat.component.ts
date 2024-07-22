@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { ApiService } from '../service/api.service';
-import { CommonModule, formatDate } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CrudService } from '../service/crud.service';
 import { SessionService } from '../service/session.service';
@@ -34,13 +34,16 @@ import { DatePipe } from '@angular/common';
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, AfterViewChecked {
   userInput: string = '';
   nombrePerfil: string = '';
   conversacion: any[] = [];
   response: any;
   systemInput: string = '';  // Inicialización con un valor por defecto
   isLoading: boolean = false;
+
+  @ViewChild('messagesContainer')
+  private messagesContainer!: ElementRef;
 
   constructor(
     private apiService: ApiService,
@@ -50,87 +53,59 @@ export class ChatComponent implements OnInit {
     private datePipe: DatePipe
   ) {}
 
-  autoResizeTextarea(event: any): void {
-    const textarea = event.target;
-    textarea.style.height = 'auto'; // Resetea la altura
-    if (textarea.scrollHeight < 200) { // 200px es la altura máxima que deseas
-      textarea.style.height = textarea.scrollHeight + 'px';
+  ngOnInit(): void {
+    const perfil = this.sessionService.obtenerPerfilSeleccionado();
+    const usuario = this.sessionService.obtenerUsuario();
+    
+    console.log('Perfil obtenido:', perfil);
+    console.log('Usuario obtenido:', usuario);
+
+    if (perfil && usuario && usuario.id_usuario) {
+      this.nombrePerfil = perfil.nombre;
+      this.systemInput = perfil.promptSystem;
+      console.log('Perfil seleccionado:', perfil);
+      console.log('System input asignado:', this.systemInput);
+
+      this.cargarMensajes();
     } else {
-      textarea.style.overflowY = 'auto'; // Asegura que el scroll aparece si se alcanza la altura máxima
-      textarea.style.height = '200px';
+      console.error('Perfil o usuario no definido o id_usuario no disponible');
+      this.router.navigate(['/perfiles']);
     }
   }
-  
-  formatDate(date: string | Date): string {
-    return this.datePipe.transform(date, 'yyyy-MM-dd HH:mm:ss') || '';
+
+  ngAfterViewChecked(): void {
+    this.scrollToBottom();
   }
 
-  formatReceivedDate(date: string | Date): string {
-    const adjustedDate = new Date(new Date(date).getTime() + 6 * 60 * 60 * 1000); // Suma 6 horas
-    return this.datePipe.transform(adjustedDate, 'yyyy-MM-dd HH:mm:ss') || '';
-  }
-
-  handleTextareaKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault(); // Evita el salto de línea
-      this.sendInput(); // Llama a tu función para enviar el mensaje
+  sendInput(): void {
+    if (!this.userInput.trim()) {
+      console.log('El input del usuario está vacío.');
+      return;
     }
-  }  
 
-ngOnInit(): void {
-  const perfil = this.sessionService.obtenerPerfilSeleccionado();
-  const usuario = this.sessionService.obtenerUsuario();
-  
-  // Añadir log para verificar el perfil y el usuario
-  console.log('Perfil obtenido:', perfil);
-  console.log('Usuario obtenido:', usuario);
+    this.isLoading = true;
+    console.log('Enviando datos:', { systemContent: this.systemInput, userContent: this.userInput });
+    console.log('System content que se enviará:', this.systemInput);
+    console.log('User content que se enviará:', this.userInput);
 
-  // Comprobar si tanto el perfil como el usuario están definidos y el usuario tiene un id.
-  if (perfil && usuario && usuario.id_usuario) {
-    this.nombrePerfil = perfil.nombre; // Asignar el nombre del perfil a una variable para usar en la vista, por ejemplo.
-    this.systemInput = perfil.promptSystem; // Asegúrate de que esto es correcto y coincide con el nombre de la propiedad en el perfil.
-    console.log('Perfil seleccionado:', perfil);
-    console.log('System input asignado:', this.systemInput);
-
-    // Llamar a cargarMensajes que internamente maneja todo lo necesario sin requerir parámetros.
-    this.cargarMensajes();
-  } else {
-    console.error('Perfil o usuario no definido o id_usuario no disponible');
-    this.router.navigate(['/perfiles']); // Redirecciona al usuario a seleccionar un perfil si no hay uno adecuado.
-  }
-}
-
-sendInput(): void {
-  if (!this.userInput.trim()) {
-    console.log('El input del usuario está vacío.');
-    return; // Evita enviar mensajes vacíos
-  }
-
-  this.isLoading = true; // Activar el overlay antes de la llamada API
-  console.log('Enviando datos:', { systemContent: this.systemInput, userContent: this.userInput });
-  
-  // Asegúrate de que systemInput tiene el valor esperado
-  console.log('System content que se enviará:', this.systemInput);
-  console.log('User content que se enviará:', this.userInput);
-
-  this.apiService.predict(this.systemInput, this.userInput).subscribe({
-    next: (data) => {
-      if (data && data.response) {
-        this.response = data.response;
-        this.guardarMensajeEnviado(this.userInput);
-        this.guardarMensajeRecibido(this.response);
-        this.userInput = ''; // Limpia el userInput para el próximo mensaje
-      } else {
-        console.error('Formato de respuesta inesperado:', data);
+    this.apiService.predict(this.systemInput, this.userInput).subscribe({
+      next: (data) => {
+        if (data && data.response) {
+          this.response = data.response;
+          this.guardarMensajeEnviado(this.userInput);
+          this.guardarMensajeRecibido(this.response);
+          this.userInput = '';
+        } else {
+          console.error('Formato de respuesta inesperado:', data);
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error al recibir respuesta:', error);
+        this.isLoading = false;
       }
-      this.isLoading = false; // Desactivar el overlay cuando se recibe la respuesta
-    },
-    error: (error) => {
-      console.error('Error al recibir respuesta:', error);
-      this.isLoading = false; // Desactivar el overlay en caso de error
-    }
-  });
-}
+    });
+  }
 
   guardarMensajeEnviado(mensaje: string): void {
     const usuarioID = this.sessionService.obtenerUsuario().id_usuario;
@@ -140,14 +115,12 @@ sendInput(): void {
     this.crudService.create('guardarMensajeEnviado', datos).subscribe({
       next: (response) => {
         const fechaGuardado = new Date();
-        // Agrega el mensaje al inicio del array
-        this.conversacion.unshift({
+        this.conversacion.push({
           tipo: 'enviado',
           texto: mensaje,
           fecha: this.formatDate(fechaGuardado)
         });
-        // Opcional: Ordena si es necesario por alguna razón
-        this.conversacion.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+        this.scrollToBottom();
       },
       error: (error) => {
         console.error('Error al guardar el mensaje enviado', error);
@@ -161,14 +134,12 @@ sendInput(): void {
     this.crudService.create('guardarMensajeRecibido', { cuerpoMensaje: mensaje, usuarioID, perfilIAID }).subscribe({
       next: (response) => {
         const fechaGuardado = new Date();
-        // Agrega el mensaje al inicio del array
-        this.conversacion.unshift({
+        this.conversacion.push({
           tipo: 'recibido',
           texto: mensaje,
           fecha: this.formatDate(fechaGuardado)
         });
-        // Opcional: Ordena si es necesario por alguna razón
-        this.conversacion.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+        this.scrollToBottom();
       },
       error: (error) => {
         console.error('Error al guardar el mensaje recibido', error);
@@ -177,8 +148,8 @@ sendInput(): void {
   }  
 
   agregarYMzclarMensajes(nuevosMensajes: any[]): void {
-    this.conversacion = [...this.conversacion, ...nuevosMensajes]; // Añade nuevos mensajes a la conversación existente
-    this.conversacion.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()); // Ordena por fecha descendente
+    this.conversacion = [...this.conversacion, ...nuevosMensajes];
+    this.ordenarMensajes();
   }
   
   cargarMensajes(): void {
@@ -204,17 +175,54 @@ sendInput(): void {
           id: mensaje.MensajeRecibidoID,
           tipo: 'recibido',
           texto: mensaje.CuerpoMensaje,
-          fecha: this.formatReceivedDate(mensaje.FechaGuardado)
+          fecha: this.formatDate(mensaje.FechaGuardado)
         })) : [])
       )
     }).subscribe(({ enviados, recibidos }) => {
-      // Añade los mensajes recibidos y enviados al array temporal
       const mensajesTemporales = [...enviados, ...recibidos];
-      // Ordena los mensajes por fecha
-      mensajesTemporales.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
-      // Asigna el array ordenado a la conversación que se muestra en el HTML
-      this.conversacion = mensajesTemporales;
+      this.agregarYMzclarMensajes(mensajesTemporales);
+      this.scrollToBottom();
     });
+  }
+
+  ordenarMensajes(): void {
+    this.conversacion.sort((a, b) => {
+      const fechaA = new Date(a.fecha).getTime();
+      const fechaB = new Date(b.fecha).getTime();
+      if (fechaA === fechaB) {
+        return a.tipo === 'enviado' ? -1 : 1; // Si las fechas son iguales, "recibido" va primero
+      }
+      return fechaA - fechaB;
+    });
+  }
+
+  formatDate(date: string | Date): string {
+    return this.datePipe.transform(date, 'yyyy-MM-dd HH:mm:ss') || '';
+  }
+
+  formatReceivedDate(date: string | Date): string {
+    return this.datePipe.transform(date, 'yyyy-MM-dd HH:mm:ss') || '';
+  }
+
+  scrollToBottom(): void {
+    try {
+      this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
+    } catch (err) {
+      console.error('Error al desplazar al final:', err);
+    }
+  }
+
+  autoResizeTextarea(event: any): void {
+    const textarea = event.target;
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  }
+
+  handleTextareaKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendInput();
+    }
   }
   
   borrarMensaje(mensaje: any): void {
@@ -233,9 +241,10 @@ sendInput(): void {
       next: (response: any) => {
         console.log('Respuesta al borrar mensaje enviado:', response);
         if (response.success) {
-          this.cargarMensajes();  // Recargar los mensajes para actualizar la UI
+          this.conversacion = this.conversacion.filter(msg => msg.id !== mensajeID);
+          this.ordenarMensajes();
+          this.scrollToBottom();
         } else {
-          this.cargarMensajes();
           console.error('Error al borrar mensaje enviado:', response.error);
         }
       },
@@ -251,9 +260,10 @@ sendInput(): void {
       next: (response: any) => {
         console.log('Respuesta al borrar mensaje recibido:', response);
         if (response.success) {
-          this.cargarMensajes();  // Recargar los mensajes para actualizar la UI
+          this.conversacion = this.conversacion.filter(msg => msg.id !== mensajeID);
+          this.ordenarMensajes();
+          this.scrollToBottom();
         } else {
-          this.cargarMensajes();
           console.error('Error al borrar mensaje recibido:', response.error);
         }
       },
