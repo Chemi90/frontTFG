@@ -39,7 +39,7 @@ export class ChatComponent implements OnInit {
   nombrePerfil: string = '';
   conversacion: any[] = [];
   response: any;
-  systemInput: string;  // Asegúrate de que este tipo sea string
+  systemInput: string = '';  // Inicialización con un valor por defecto
   isLoading: boolean = false;
 
   constructor(
