@@ -45,10 +45,11 @@ export class SessionService {
     return !!this.usuario;
   }
 
-  guardarPerfilSeleccionado(perfil: any) {
+guardarPerfilSeleccionado(perfil: any) {
+    console.log('Guardando perfil seleccionado:', perfil);
     this.perfilSeleccionado = perfil;
     sessionStorage.setItem('perfilSeleccionado', JSON.stringify(perfil));
-  }
+}
 
   obtenerPerfilSeleccionado() {
     return this.perfilSeleccionado;
