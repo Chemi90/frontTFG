@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
-
 import { ApiService } from '../service/api.service';
 import { CommonModule, formatDate } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -41,7 +39,7 @@ export class ChatComponent implements OnInit {
   nombrePerfil: string = '';
   conversacion: any[] = [];
   response: any;
-  systemInput: any;
+  systemInput: string;  // Asegúrate de que este tipo sea string
   isLoading: boolean = false;
 
   constructor(
@@ -64,17 +62,11 @@ export class ChatComponent implements OnInit {
   }
   
   formatDate(date: string | Date): string {
-    if (!date) return '';
-    const parsedDate = new Date(date);
-    if (isNaN(parsedDate.getTime())) return '';
-    return this.datePipe.transform(parsedDate, 'yyyy-MM-dd HH:mm:ss') || '';
+    return this.datePipe.transform(date, 'yyyy-MM-dd HH:mm:ss') || '';
   }
 
   formatReceivedDate(date: string | Date): string {
-    if (!date) return '';
-    const parsedDate = new Date(date);
-    if (isNaN(parsedDate.getTime())) return '';
-    const adjustedDate = new Date(parsedDate.getTime() + 6 * 60 * 60 * 1000); // Suma 6 horas
+    const adjustedDate = new Date(new Date(date).getTime() + 6 * 60 * 60 * 1000); // Suma 6 horas
     return this.datePipe.transform(adjustedDate, 'yyyy-MM-dd HH:mm:ss') || '';
   }
 
@@ -92,7 +84,7 @@ export class ChatComponent implements OnInit {
     // Comprobar si tanto el perfil como el usuario están definidos y el usuario tiene un id.
     if (perfil && usuario && usuario.id_usuario) {
       this.nombrePerfil = perfil.nombre; // Asignar el nombre del perfil a una variable para usar en la vista, por ejemplo.
-      this.systemInput = perfil.PromptSystem; // Suponiendo que este es un valor utilizado en alguna parte de la vista.
+      this.systemInput = perfil.promptSystem; // Asegúrate de que esto es correcto y coincide con el nombre de la propiedad en el perfil.
   
       // Llamar a cargarMensajes que internamente maneja todo lo necesario sin requerir parámetros.
       this.cargarMensajes();
@@ -181,10 +173,6 @@ export class ChatComponent implements OnInit {
     const perfil = this.sessionService.obtenerPerfilSeleccionado();
     const usuario = this.sessionService.obtenerUsuario();
   
-    // Añadir logs para depuración
-    console.log('Perfil seleccionado:', perfil);
-    console.log('Usuario obtenido:', usuario);
-  
     if (!perfil || !usuario) {
       console.error('Perfil o usuario no seleccionado.');
       return;
@@ -192,40 +180,28 @@ export class ChatComponent implements OnInit {
   
     forkJoin({
       enviados: this.crudService.create('mostrarMensajeEnviado', { perfilIAID: perfil.id, usuarioID: usuario.id_usuario }).pipe(
-        map((response: any) => {
-          console.log('Respuesta de mostrarMensajeEnviado:', response);
-          return response.success && response.data ? response.data.map((mensaje: any) => ({
-            id: mensaje.MensajeEnviadoID,
-            tipo: 'enviado',
-            texto: mensaje.CuerpoMensaje,
-            fecha: this.formatDate(mensaje.FechaGuardado)
-          })) : [];
-        })
+        map((response: any) => response.success && response.data ? response.data.map((mensaje: any) => ({
+          id: mensaje.MensajeEnviadoID,
+          tipo: 'enviado',
+          texto: mensaje.CuerpoMensaje,
+          fecha: this.formatDate(mensaje.FechaGuardado)
+        })) : [])
       ),
       recibidos: this.crudService.create('mostrarMensajeRecibido', { perfilIAID: perfil.id, usuarioID: usuario.id_usuario }).pipe(
-        map((response: any) => {
-          console.log('Respuesta de mostrarMensajeRecibido:', response);
-          return response.success && response.data ? response.data.map((mensaje: any) => ({
-            id: mensaje.MensajeRecibidoID,
-            tipo: 'recibido',
-            texto: mensaje.CuerpoMensaje,
-            fecha: this.formatReceivedDate(mensaje.FechaGuardado)
-          })) : [];
-        })
+        map((response: any) => response.success && response.data ? response.data.map((mensaje: any) => ({
+          id: mensaje.MensajeRecibidoID,
+          tipo: 'recibido',
+          texto: mensaje.CuerpoMensaje,
+          fecha: this.formatReceivedDate(mensaje.FechaGuardado)
+        })) : [])
       )
-    }).subscribe({
-      next: ({ enviados, recibidos }) => {
-        // Añade los mensajes recibidos y enviados al array temporal
-        const mensajesTemporales = [...enviados, ...recibidos];
-        // Ordena los mensajes por fecha
-        mensajesTemporales.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
-        // Asigna el array ordenado a la conversación que se muestra en el HTML
-        this.conversacion = mensajesTemporales;
-        console.log('Mensajes combinados:', this.conversacion);
-      },
-      error: (error) => {
-        console.error('Error al cargar mensajes:', error);
-      }
+    }).subscribe(({ enviados, recibidos }) => {
+      // Añade los mensajes recibidos y enviados al array temporal
+      const mensajesTemporales = [...enviados, ...recibidos];
+      // Ordena los mensajes por fecha
+      mensajesTemporales.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+      // Asigna el array ordenado a la conversación que se muestra en el HTML
+      this.conversacion = mensajesTemporales;
     });
   }
   
