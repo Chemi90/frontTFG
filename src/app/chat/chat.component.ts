@@ -80,7 +80,11 @@ export class ChatComponent implements OnInit {
 ngOnInit(): void {
   const perfil = this.sessionService.obtenerPerfilSeleccionado();
   const usuario = this.sessionService.obtenerUsuario();
-console.log('System input asignado:', perfil.promptSystem);
+  
+  // Añadir log para verificar el perfil y el usuario
+  console.log('Perfil obtenido:', perfil);
+  console.log('Usuario obtenido:', usuario);
+
   // Comprobar si tanto el perfil como el usuario están definidos y el usuario tiene un id.
   if (perfil && usuario && usuario.id_usuario) {
     this.nombrePerfil = perfil.nombre; // Asignar el nombre del perfil a una variable para usar en la vista, por ejemplo.
@@ -104,6 +108,11 @@ sendInput(): void {
 
   this.isLoading = true; // Activar el overlay antes de la llamada API
   console.log('Enviando datos:', { systemContent: this.systemInput, userContent: this.userInput });
+  
+  // Asegúrate de que systemInput tiene el valor esperado
+  console.log('System content que se enviará:', this.systemInput);
+  console.log('User content que se enviará:', this.userInput);
+
   this.apiService.predict(this.systemInput, this.userInput).subscribe({
     next: (data) => {
       if (data && data.response) {
