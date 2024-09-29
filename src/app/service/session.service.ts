@@ -17,6 +17,7 @@ export class SessionService {
     const usuarioData = sessionStorage.getItem('usuario');
     if (usuarioData) {
       this.usuario = JSON.parse(usuarioData);
+      console.log('Usuario cargado de sessionStorage:', this.usuario);
     }
   }
 
@@ -24,12 +25,14 @@ export class SessionService {
     const perfilData = sessionStorage.getItem('perfilSeleccionado');
     if (perfilData) {
       this.perfilSeleccionado = JSON.parse(perfilData);
+      console.log('Perfil cargado de sessionStorage:', this.perfilSeleccionado);
     }
   }
 
   iniciarSesion(usuario: any) {
     this.usuario = usuario;
     sessionStorage.setItem('usuario', JSON.stringify(usuario));
+    console.log('Usuario iniciado sesión:', this.usuario);
   }
 
   finalizarSesion() {
@@ -37,9 +40,11 @@ export class SessionService {
     this.usuario = null;
     this.perfilSeleccionado = null;
     this.memorias = {}; // Limpiar todas las memorias al finalizar la sesión
+    console.log('Sesión finalizada y datos limpiados.');
   }
 
   obtenerUsuario() {
+    console.log('Usuario obtenido:', this.usuario);
     return this.usuario;
   }
 
@@ -50,9 +55,11 @@ export class SessionService {
   guardarPerfilSeleccionado(perfil: any) {
     this.perfilSeleccionado = perfil;
     sessionStorage.setItem('perfilSeleccionado', JSON.stringify(perfil));
+    console.log('Perfil seleccionado y guardado:', this.perfilSeleccionado);
   }
 
   obtenerPerfilSeleccionado() {
+    console.log('Perfil seleccionado obtenido:', this.perfilSeleccionado);
     return this.perfilSeleccionado;
   }
 

@@ -16,6 +16,24 @@ import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DatePipe } from '@angular/common';
 
+interface Mensaje {
+  id: number;
+  tipo: 'enviado' | 'recibido';
+  texto: string;
+  fecha: string;
+}
+
+interface Usuario {
+  id_usuario: number;
+  nombre: string;
+}
+
+interface Perfil {
+  id: number;
+  nombre: string;
+  promptSystem: string;
+}
+
 @Component({
   selector: 'app-chat',
   standalone: true,
@@ -35,11 +53,11 @@ import { DatePipe } from '@angular/common';
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit, AfterViewChecked {
-  userInput: string = '';
+  userInput: string = ''; // Inicializar como cadena vacía
   nombrePerfil: string = '';
   conversacion: any[] = [];
   response: any;
-  systemInput: string = '';  // Inicialización con un valor por defecto
+  systemInput: string = ''; // Inicializar como cadena vacía
   isLoading: boolean = false;
 
   @ViewChild('messagesContainer')
@@ -88,6 +106,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     console.log('System content que se enviará:', this.systemInput);
     console.log('User content que se enviará:', this.userInput);
 
+    // Ya no es necesario usar aserciones `!`
     this.apiService.predict(this.systemInput, this.userInput).subscribe({
       next: (data) => {
         if (data && data.response) {
@@ -106,7 +125,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       }
     });
   }
-
+  
   guardarMensajeEnviado(mensaje: string): void {
     const usuarioID = this.sessionService.obtenerUsuario().id_usuario;
     const perfilIAID = this.sessionService.obtenerPerfilSeleccionado().id;
@@ -190,7 +209,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
             fecha: this.formatDateFromServer(mensaje.FechaGuardado, -2) // Restar 2 horas
           })) : [])
         )
-      }).subscribe(({ enviados, recibidos }) => {
+      }).subscribe(({ enviados, recibidos }: { enviados: Mensaje[], recibidos: Mensaje[] }) => {
         const mensajesTemporales = [...enviados, ...recibidos];
         this.agregarYMzclarMensajes(mensajesTemporales);
         this.scrollToBottom();
