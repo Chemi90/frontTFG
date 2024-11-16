@@ -84,7 +84,7 @@
 
 .sent {
   display: flex;
-  justify-content: flex-end; /* Alinea los mensajes enviados a la derecha */
+  justify-content: flex-end;
 }
 
 .sent mat-card-content {
