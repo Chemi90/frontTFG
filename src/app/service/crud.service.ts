@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class CrudService {
-  public server = 'https://josemiguelruizguevara.com:5000/api/chatbot'; // Nueva URL para Flask
+  public server = 'https://josemiguelruizguevara.com:5000/api/chatbot/'; // Nueva URL para Flask
 
   constructor(private http: HttpClient) {}
 
